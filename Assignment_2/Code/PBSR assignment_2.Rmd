@@ -1,5 +1,5 @@
 ---
-title: "**Probability and Statistics with R **"
+title: "** Probability and Statistics with R**"
 author: "Sneha KK, Sarvesh Bhandary, Anna Maria"
 date: "Submission Nov 16-2022 (Wednesday)"
 output: pdf_document
