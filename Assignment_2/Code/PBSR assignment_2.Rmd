@@ -278,13 +278,13 @@ $$
 n=nrow(data)
 Gamma = function(p0){
   NLL = function(x,par){
-    alpha = with(x, par[1]+par[2]*log(Holders))
+    alpha = with(x, exp(par[1]+par[2]*log(Holders)))
      f4 = function(x,alpha,sigma){
       return ((exp(-x/sigma)*x^(alpha-1))/((sigma^alpha)*gamma(alpha)))
     }
      LL = c()
      for (i in 1:n){
-       LL = c(LL, f4(x[i,'Claims'],exp(alpha[i]),par[3]))
+       LL = c(LL, f4(x[i,'Claims'],(alpha[i]),par[3]))
      }
      return (-sum(log(LL)))
   }
@@ -294,11 +294,12 @@ Gamma = function(p0){
   cat("BIC =",BIC)
   return(fit$par)
 }
-pars = Gamma(c(0,0.0001,0.3))
+pars = Gamma(c(0,0,100))
 plot(Insurance$Holders,Insurance$Claims ,xlab = 'Holders',ylab='Claims',pch=20)
 x = seq(0,4000,length.out=10000)
 lines(x,pars[1]+pars[2]*x,col='red')
 grid()
+
 
 ```
 
