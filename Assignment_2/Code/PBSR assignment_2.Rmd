@@ -39,8 +39,49 @@ $$
 But we have to be careful and put proper conditions in place and modify $S$ in such a way so that it becomes proper probability distributions. 
 
 1. Figure out the necesary conditions and define the probability distribution model using $S$.
+We require the summation to be equal to 1.
+It is $\sum_{n=0}^{}\mathbb{P}(X=n) = 1$ 
+For geometric series to converge, we need $r<1$
+Sum of the series equals $\frac{a}{1-r}$
+Therefore $a = 1-r$
+Probabilities should lie between 0 and 1.
+Hence $0<r<1$ and $a = 1-r$
+  
+$\mathbb{P}(X=n)=(1-r)^nr$, which is the pmf of Geometric(1-r).
+
+Hence X follows Geometric distribution.
+
 2. Check if mean and variance exists for the probability model. 
+Mean and variance exists for geometric distribution. Hence it exists for the given probability model also.
+
 3. Can you find the analytically expression of mean and variance.
+\begin{itemize}
+\item [1.] Mean
+\begin{align*}
+E[X] &= \sum_{n=0}n{\mathbb{P}(X=n)}\\
+     &= \sum_{n=0}n(1-r)r^n\\
+     &= r\sum_{n=0}n(1-r)r^{n-1}\\
+     &= r\sum_{n=1}(n-1)(1-r)r^{n-1} + r\sum_{n=1}(1-r)r^{n-1}\\
+     &= rE[X] + r(1-r)(\frac{1}{1-r})\\
+     &= rE[X] + r\\
+\text{Hence,}~ E[X] = \frac{r}{1-r}
+\end{align*}
+
+\item [2.] Variance
+\begin{align*}
+E[X^2] &= \sum_{n=0}n^2{\mathbb{P}(X=n)}\\
+     &= \sum_{n=0}n^2(1-r)r^n\\
+     &= r\sum_{n=0}n^2(1-r)r^{n-1}\\
+     &= r\sum_{n=1}(n-1)^2(1-r)r^{n-1} + \sum_{n=1}2n(1-r)r^{n} - r\sum_{n=1}(1-r)r^{n-1}\\
+     &= rE[X^2] + 2E[X] - r(1-r)\frac{1}{1-r}\\
+     &= rE[X^2] + \frac{2r}{1-r} - r\\
+\text{Hence,}~ E[X^2] = \frac{r^2 + r}{(1-r)^2}. ~\text{Therefore,}\\
+Var(X) &= E[X^2] - (E[X])^2\\
+       &= \frac{r^2 + r}{(1-r)^2} - \frac{r^2}{(1-r)^2}\\
+       &= \frac{r}{(1-r)^2}\\
+\end{align*}
+\end{itemize}
+
 4. From historical data we found the following summary statistics
 \begin{table}[ht]
 \centering
@@ -139,16 +180,56 @@ $$
 $$
 f(x)=p*Gamma(x|\alpha,\sigma_1)+(1-p)N(x|\mu,\sigma_2^2),~~0<p<1
 $$
+```{r}
+x = faithful$waiting
+MLE1 = function(x, st){
+nll1 = function(x, par){
+  return (sum(-log(par[1]*dgamma(x,par[2],par[3]) + (1-par[1])*dnorm(x,par[4],par[5]))))
+}
+pars = optim(par = st, nll1, x=x, lower = c(0,0,0,-Inf,0), upper=c(1,Inf,Inf,Inf,Inf), method = 'L-BFGS-B')$par
+cat(cat('The optimal values of p, alpha, sigma_1, mu. sigma_2 is', pars),sep='\n')
+cat('AIC =', 2*nll1(x, pars) + 2*length(pars))
+return (pars)
+}
+pars = MLE1(x,c(0.5,55,1,85,1))
+```
 
 (ii) **Model 2**:
 $$
 f(x)=p*Gamma(x|\alpha_1,\sigma_1)+(1-p)Gamma(x|\alpha_2,\sigma_2),~~0<p<1
 $$
+```{r}
+x = faithful$waiting
+MLE2 = function(x, st){
+nll2 = function(x, par){
+  return (sum(-log(par[1]*dgamma(x,par[2],par[3]) + (1-par[1])*dgamma(x,par[4],par[5]))))
+}
+pars = optim(par = st, nll2, x=x, lower = c(0,0,0,0,0), upper=c(1,Inf,Inf,Inf,Inf), method = 'L-BFGS-B')$par
+cat(cat('The optimal values of p, alpha, sigma_1, mu. sigma_2 is', pars),sep='\n')
+cat('AIC =', 2*nll2(x, pars) + 2*length(pars))
+return (pars)
+}
+pars = MLE2(x,c(0.5,55,1,85,1))
+```
+
 
 (iii) **Model 3**:
 $$
 f(x)=p*logNormal(x|\mu_1,\sigma_1^2)+(1-p)logNormal(x|\mu_1,\sigma_1^2),~~0<p<1
 $$
+```{r}
+x = faithful$waiting
+MLE3 = function(x, st){
+nll3 = function(x, par){
+  return (sum(-log(par[1]*dlnorm(x,par[2],par[3]) + (1-par[1])*dlnorm(x,par[4],par[5]))))
+}
+pars = optim(par = st, nll3, x=x, lower = c(0,-Inf,0,-Inf,0), upper=c(1,Inf,Inf,Inf,Inf), method = 'L-BFGS-B')$par
+cat(cat('The optimal values of p, alpha, sigma_1, mu. sigma_2 is', pars),sep='\n')
+cat('AIC =', 2*nll3(x, pars) + 2*length(pars))
+return (pars)
+}
+pars = MLE3(x,c(0.5,4,1,4.4,1))
+```
 
 \newpage
 
