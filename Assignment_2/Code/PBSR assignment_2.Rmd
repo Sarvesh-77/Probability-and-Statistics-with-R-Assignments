@@ -277,7 +277,9 @@ Note that $\beta_0,\beta_1 \in\mathbb{R}$ and $\sigma \in \mathbb{R}^{+}$.
 (ii) Calculate **Bayesian Information Criterion** (BIC) for the model.
 
 ```{r}
-n=nrow(data)
+data1<-data[data$Claims !=0,]
+row.names(data1)<-NULL
+n=nrow(data1)
 Lognorm = function(p0){
   NLL = function(x,par){
     mean = with(x, par[1]+par[2]*Holders)
@@ -290,7 +292,7 @@ Lognorm = function(p0){
      }
      return (-sum(log(LL)))
   }
- fit=optim(par=p0,NLL,x=data)
+ fit=optim(par=p0,NLL,x=data1)
   cat(cat("MLE=",fit$par),sep="\n")
   BIC = 3*log(n)+2*fit$value
   cat("BIC =",BIC)
