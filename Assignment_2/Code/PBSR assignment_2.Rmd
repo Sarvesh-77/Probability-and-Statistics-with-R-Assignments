@@ -1,5 +1,5 @@
 ---
-title: "**Probability and Statistics with R **"
+title: "**Probability and Statistics with R**"
 author: "Sneha KK, Sarvesh Bhandary, Anna Maria"
 date: "Submission Nov 16-2022 (Wednesday)"
 output: pdf_document
@@ -69,6 +69,15 @@ $$
 The mean and variance are $E(X)=\alpha\sigma$ and $Var(X)=\alpha\sigma^2$. Note that `shape = ` $\alpha$ and `scale = ` $\sigma$.
 
 1. Write a `function` in `R` which will compute the MLE of $\theta=\log(\alpha)$ using `optim` function in `R`. You can name it `MyMLE`
+```{r}
+MyMLE=function(obs,st){
+  logsum=function(params,x){
+    return(sum(+params[1]*log(params[2])+log(gamma(params[1]))+(x/params[2])-(params[1]-1)*log(x)))
+  }
+  pars=optim(par=st,logsum,x=obs)$par
+  return(log(pars[1]))
+}
+```
 2. Choose `n=20`, and `alpha=1.5` and `sigma=2.2`
      (i) Simulate $\{X_1,X_2,\cdots,X_n\}$ from `rgamma(n=20,shape=1.5,scale=2.2)`
      (ii) Apply the `MyMLE` to estimate $\theta$ and append the value in a vector
@@ -76,10 +85,39 @@ The mean and variance are $E(X)=\alpha\sigma$ and $Var(X)=\alpha\sigma^2$. Note 
      (iv) Draw histogram of the estimated MLEs of $\theta$.
      (v) Draw a vertical line using `abline` function at the true value of $\theta$.
      (vi) Use `quantile` function on estimated $\theta$'s to find the 2.5 and 97.5-percentile points. 
+```{r}
+simu<-function(n,simu_size,alpha,sigma){
+theta=c()
+for (i in 1:simu_size){
+  obs=rgamma(n=n,shape=alpha,scale=sigma)
+  theta=append(theta,MyMLE(obs,c(2,2)))
+}
+library(ggplot2)
+df_theta=as.data.frame(theta)
+val=log(1.5)
+plot<-ggplot(df_theta)+geom_histogram(aes(x=theta),fill='skyblue',color='black')+
+geom_vline(xintercept=val, color='red')+annotate("text",x=val-0.02,y=50,label=as.character(round(val,2)),angle=90)
+q25=quantile(theta,probs=seq(0,1,0.025))
+q75=quantile(theta,probs=seq(0,1,0.975))
+print(plot)
+cat(cat("The 2.5 th percentile is",q25[2]),sep='\n')
+cat(cat("The 97.5th percentile is",q75[2]),sep='\n')
+cat(cat("The gap between 2.5 and 97.5 percentile points is ",q75[2]-q25[2]),sep='\n')
+return(q75[2]-q25[2])}
+q2<-simu(20,1000,1.5,2.2)
+```
 3.  Choose `n=40`, and `alpha=1.5` and repeat the (2).
+```{r}
+q3<-simu(40,1000,1.5,2.2)
+```
 4.  Choose `n=100`, and `alpha=1.5` and repeat the (2).
+```{r}
+q4<-simu(100,1000,1.5,2.2)
+```
 5. Check if the gap between 2.5 and 97.5-percentile points are shrinking as sample size `n` is increasing?
-
+```{r}
+cat("The values for n=20,40,100 are",q2,",",q3,",",q4,"respectively. As we can see,the gap between 2.5 and 97.5 percentile points are shrinking as sample size is increasing")
+```
 *Hint*: Perhaps you should think of writing a single `function` where you will provide the values of `n`, `sim_size`, `alpha` and `sigma`; and it will return the desired output. 
 
 \newpage
@@ -362,15 +400,35 @@ $$
 where $\mathbb{E}(\varepsilon)=0$ and $\mathbb{V}ar(\varepsilon)=\sigma^2$.
 
 1. Estimate the parameters of the models $\theta=(\alpha,\beta,\sigma)$ using the method of moments type plug-in estimator discussed in the class.
-
+```{r}
+E_tcs=mean(retrn$TCS.NS.Adjusted)
+E_nif=mean(retrn$NSEI.Adjusted)
+Var_tcs=var(retrn$TCS.NS.Adjusted)
+Var_nif=var(retrn$NSEI.Adjusted)
+Cov=cov(retrn$TCS.NS.Adjusted,retrn$NSEI.Adjusted)
+Beta_mom=Cov/Var_nif
+Alpha_mom=E_tcs-Beta_mom*E_nif
+Sigma_mom=sqrt(Var_tcs-((Beta_mom)^2*Var_nif))
+cat("Method of moments plug in estimator of theta is: (",Alpha_mom,",",Beta_mom,",",Sigma_mom,")")
+```
 2. Estimate the parameters using the `lm` built-in function of `R`. Note that `lm` using the OLS method.
-
+```{r}
+lmpar=summary(lm(TCS.NS.Adjusted~NSEI.Adjusted,data=retrn))
+Beta_lm=lmpar$coef[2,1]
+Alpha_lm=lmpar$coef[1,1]
+Sigma_lm=lmpar$sigma
+cat("Estimator of theta using lm function is: (",Alpha_lm,",",Beta_lm,",",Sigma_lm,")")
+```
 3. Fill-up the following table
 
 Parameters | Method of Moments | OLS
 -----------|-------------------|-----
-$\alpha$   |                   |
-$\beta$    |                   |
-$\sigma$   |                   |
+$\alpha$   | 0.0004611203      | 0.0004611203
+$\beta$    | 0.7436965         | 0.7436965
+$\sigma$   | 0.01618653        | 0.01618873
 
 4. If the current value of Nifty is 18000 and it goes up to 18200. The current value of TCS is Rs. 3200/-. How much you can expect TCS price to go up?
+```{r}
+P_TCS=3200*exp(Alpha_mom+Beta_mom*log(18200/18000))
+cat("We can expect the TCS price to go up to",P_TCS)
+```
