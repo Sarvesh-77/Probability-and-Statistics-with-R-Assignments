@@ -1,15 +1,25 @@
 ---
-title: "**Probability and Statistics with R**"
-author: "Sneha KK, Sarvesh Bhandary, Anna Maria"
+title: '**Probability and Statistics with R**'
+author: '**Assignment 2**'
 date: "Submission Nov 16-2022 (Wednesday)"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 ---
+
+Group Members: 
+Anna Maria KV (MDS202209)
+Sarvesh Bhandary
+Sneha KK(MDS202240)
 
 
 ```{r}
 knitr::opts_chunk$set(echo=TRUE,warning=FALSE, message = FALSE,
 fig.height = 5, fig.width = 10, fig.align = "center")
 ```
+
+
 **Note**: Below I explain how you collaborate on `GitHub`.
 
 1. It will be group assignment. 
@@ -94,11 +104,15 @@ Using the summary statistics and your newly defined probability distribution mod
  a. What is the probability that home team will score at least one goal?
  b. What is the probability that home team will score at least one goal but less than four goal?
 
+We can see that the mean and the variance of the distribution, when equated to $\frac{r}{1-r}$ and $\frac{r}{(1-r)^2}$ yield different values of r, and hence it is not possible for this to happen simultaneously.
+
 5. Suppose on another thought you want to model it with off-the shelf Poisson probability models. Under the assumption that underlying distribution is Poisson probability find the above probabilities, i.e.,
  a. What is the probability that home team will score at least one goal?
  b. What is the probability that home team will score at least one goal but less than four goal?
 6. Which probability model you would prefer over another?
 7. Write down the likelihood functions of your newly defined probability models and Poisson models. Clearly mention all the assumptions that you are making.
+
+Mean and variance of Poisson distribution must be same and hence the given values are not possible.
 
 ## Problem 2 : Simulation Study to Understand Sampling Distribution
 
@@ -255,6 +269,7 @@ f=function(x, par){
 hist(faithful$waiting,xlab = 'waiting',probability = T,col='lightpink',main='')
 lines(x,f(x,pars), col = 'purple',lwd=2)
 ```
+
 The AIC values we got are: 2076.18, 2076.116, 2075.42, so clearly since the AIC value for the third model is lower, the log likelihood for third model will be the highest, and hence model 3 is the best.
 $$
 P(60<waiting<70)=P(X<70)-P(X<60)
@@ -283,6 +298,8 @@ This data frame contains the following columns:
 
 ```{r}
 library(MASS)
+attach(Insurance)
+data = Insurance[,c('Holders','Claims')]
 plot(Insurance$Holders,Insurance$Claims
      ,xlab = 'Holders',ylab='Claims',pch=20)
 grid()
@@ -309,6 +326,7 @@ $$
 (ii) Calculate **Bayesian Information Criterion** (BIC) for the model.
 
 ```{r}
+data = Insurance[,c('Holders','Claims')]
 n=nrow(data)
 Norm = function(p0){
   NLL = function(x,par){
@@ -334,7 +352,6 @@ x = seq(0,4000,length.out=10000)
 lines(x,pars[1]+pars[2]*x,col='red')
 grid()
 ```
-
 
 **Part B**: Now we want to fit the same model with change in distribution:
 $$
@@ -427,6 +444,7 @@ $$
 $$
 log(\alpha_i)=\beta_0 + \beta_1 \log(\texttt{Holders}_i), ~~i=1,2,...,n
 $$
+
 ```{r}
 n=nrow(data)
 Gamma = function(p0){
@@ -457,9 +475,9 @@ grid()
 ```
 
 
-
 (iii) Compare the BIC of all three models
 BIC for Laplace < Normal < Log Normal < Gamma, so Laplace is the best fit for this data.
+
 
 ## Problem 5: Computational Finance - Modelling Stock prices
 
@@ -526,7 +544,10 @@ Beta_mom=Cov/Var_nif
 Alpha_mom=E_tcs-Beta_mom*E_nif
 Sigma_mom=sqrt(Var_tcs-((Beta_mom)^2*Var_nif))
 cat("Method of moments plug in estimator of theta is: (",Alpha_mom,",",Beta_mom,",",Sigma_mom,")")
+
 ```
+
+
 2. Estimate the parameters using the `lm` built-in function of `R`. Note that `lm` using the OLS method.
 ```{r}
 lmpar=summary(lm(TCS.NS.Adjusted~NSEI.Adjusted,data=retrn))
@@ -535,16 +556,21 @@ Alpha_lm=lmpar$coef[1,1]
 Sigma_lm=lmpar$sigma
 cat("Estimator of theta using lm function is: (",Alpha_lm,",",Beta_lm,",",Sigma_lm,")")
 ```
+
+
 3. Fill-up the following table
 
 Parameters | Method of Moments | OLS
 -----------|-------------------|-----
-$\alpha$   | 0.0004611203      | 0.0004611203
-$\beta$    | 0.7436965         | 0.7436965
-$\sigma$   | 0.01618653        | 0.01618873
+$\alpha$   |    0.0004611203   |0.0004611203
+$\beta$    |    0.7436965      |0.7436965 
+$\sigma$   |    0.01618653     |0.01618873
 
 4. If the current value of Nifty is 18000 and it goes up to 18200. The current value of TCS is Rs. 3200/-. How much you can expect TCS price to go up?
 ```{r}
 P_TCS=3200*exp(Alpha_mom+Beta_mom*log(18200/18000))
 cat("We can expect the TCS price to go up to",P_TCS)
+
+
 ```
+
