@@ -255,7 +255,14 @@ f=function(x, par){
 hist(faithful$waiting,xlab = 'waiting',probability = T,col='lightpink',main='')
 lines(x,f(x,pars), col = 'purple',lwd=2)
 ```
-
+The AIC values we got are: 2076.18, 2076.116, 2075.42, so clearly since the AIC value for the third model is lower, the log likelihood for third model will be the highest, and hence model 3 is the best.
+$$
+P(60<waiting<70)=P(X<70)-P(X<60)
+$$
+where X has pdf in Model 3
+```{r}
+pars[1]*(plnorm(70,pars[2],pars[3])-plnorm(60,pars[2],pars[3]))+(1-pars[1])*(plnorm(70,pars[4],pars[5])-plnorm(60,pars[4],pars[5]))
+```
 \newpage
 
 ## Problem 4: Modelling Insurance Claims
