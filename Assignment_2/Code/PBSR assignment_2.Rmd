@@ -452,6 +452,7 @@ grid()
 
 
 (iii) Compare the BIC of all three models
+BIC for Laplace < Normal < Log Normal < Gamma, so Laplace is the best fit for this data.
 
 ## Problem 5: Computational Finance - Modelling Stock prices
 
