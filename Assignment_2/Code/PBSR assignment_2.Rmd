@@ -180,7 +180,7 @@ library(ggplot2)
 df_theta=as.data.frame(theta)
 val=log(1.5)
 plot<-ggplot(df_theta)+geom_histogram(aes(x=theta),fill='skyblue',color='black')+
-geom_vline(xintercept=val, color='red')+annotate("text",x=val-0.02,y=50,label=as.character(round(val,2)),angle=90)
+geom_vline(xintercept=val, color='red')+annotate("text",x=val-0.02,y=50,label=as.character(round(val,2)),angle=90)+xlim(-0.5,2)
 q25=quantile(theta,probs=seq(0,1,0.025))
 q75=quantile(theta,probs=seq(0,1,0.975))
 print(plot)
